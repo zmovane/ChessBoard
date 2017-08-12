@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ChessBoardView">
+        <attr name="negativeColor" format="color" />
+        <attr name="positiveColor" format="color" />
+    </declare-styleable>
+</resources>
