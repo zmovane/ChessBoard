@@ -18,7 +18,7 @@ import android.widget.FrameLayout
  */
 class ChessBoardView : FrameLayout, View.OnTouchListener {
 
-    var mChessman: ChessView? = null
+    var mChessmanView: ChessmanView? = null
     var cellWidth: Int? = null
 
     var negativeColor: Int = Color.BLACK
@@ -53,16 +53,16 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                if (isEnable && mChessman != null) {
+                if (isEnable && mChessmanView != null) {
                     val newX = 1 + (event.x / cellWidth!!).toInt()
                     val newY = 8 - (event.y / cellWidth!!).toInt()
-                    mChessman?.x = newX
-                    mChessman?.y = newY
+                    mChessmanView?.chessman?.x = newX
+                    mChessmanView?.chessman?.y = newY
                 }
                 return true
             }
             MotionEvent.ACTION_UP -> {
-                if (isEnable && mChessman != null)
+                if (isEnable && mChessmanView != null)
                     moveChessman()
                 return true
             }
@@ -75,21 +75,21 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
         isEnable = false
         selector?.visibility = View.GONE
 
-        val chessmanLayoutParams = mChessman?.layoutParams as FrameLayout.LayoutParams
+        val chessmanLayoutParams = mChessmanView?.layoutParams as FrameLayout.LayoutParams
 
-        val xAnim = ValueAnimator.ofInt(chessmanLayoutParams.leftMargin, cellWidth!! * (mChessman?.x!! - 1))
-        val yAnim = ValueAnimator.ofInt(chessmanLayoutParams.topMargin, cellWidth!! * (8 - mChessman?.y!!))
+        val xAnim = ValueAnimator.ofInt(chessmanLayoutParams.leftMargin, cellWidth!! * (mChessmanView?.chessman?.x!! - 1))
+        val yAnim = ValueAnimator.ofInt(chessmanLayoutParams.topMargin, cellWidth!! * (8 - mChessmanView?.chessman?.y!!))
         xAnim.addUpdateListener {
             animation ->
-            val layoutParams = mChessman?.layoutParams as FrameLayout.LayoutParams
+            val layoutParams = mChessmanView?.layoutParams as FrameLayout.LayoutParams
             layoutParams.leftMargin = animation?.animatedValue as Int
-            mChessman?.layoutParams = layoutParams
+            mChessmanView?.layoutParams = layoutParams
         }
         yAnim.addUpdateListener {
             animation ->
-            val layoutParams = mChessman?.layoutParams as FrameLayout.LayoutParams
+            val layoutParams = mChessmanView?.layoutParams as FrameLayout.LayoutParams
             layoutParams.topMargin = animation?.animatedValue as Int
-            mChessman?.layoutParams = layoutParams
+            mChessmanView?.layoutParams = layoutParams
         }
         val animSet = AnimatorSet()
         animSet.playTogether(xAnim, yAnim)
@@ -100,25 +100,30 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
             override fun onAnimationStart(animation: Animator?) = Unit
             override fun onAnimationRepeat(animation: Animator?) = Unit
             override fun onAnimationEnd(animation: Animator?) {
-                mChessman = null
+                mChessmanView = null
                 isEnable = true
             }
         })
         animSet.start()
     }
 
-    fun addChessman(chessView: ChessView) {
+    fun addChessman(chessman: Chessman) {
+
         cellWidth ?: run {
-            Handler().postDelayed({ addChessman(chessView) }, 100)
+            Handler().postDelayed({ addChessman(chessman) }, 100)
             return
         }
+
+        val chessmanView = ChessmanView(context)
+        chessmanView.chessman = chessman
+
         val chessmanLayoutParams = FrameLayout.LayoutParams(cellWidth!!, cellWidth!!)
-        chessmanLayoutParams.leftMargin = cellWidth!! * (chessView.x - 1)
-        chessmanLayoutParams.topMargin = cellWidth!! * (8 - chessView.y)
-        addView(chessView, chessmanLayoutParams)
-        chessView.setOnClickListener {
+        chessmanLayoutParams.leftMargin = cellWidth!! * (chessman.x - 1)
+        chessmanLayoutParams.topMargin = cellWidth!! * (8 - chessman.y)
+        addView(chessmanView, chessmanLayoutParams)
+        chessmanView.setOnClickListener {
             if (!isEnable) return@setOnClickListener
-            mChessman = chessView
+            mChessmanView = chessmanView
 
             if (selector == null) {
                 selector = View(context).apply {

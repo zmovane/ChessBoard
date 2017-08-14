@@ -1,7 +1,6 @@
 package com.nyakokishi.chessborad
 
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 
 
@@ -11,59 +10,48 @@ import android.support.v7.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
+
         val chessboard = findViewById(R.id.chessborad) as ChessBoardView
 
-        val bb = ContextCompat.getDrawable(this, R.drawable.bb)
-        val bk = ContextCompat.getDrawable(this, R.drawable.bk)
-        val bn = ContextCompat.getDrawable(this, R.drawable.bn)
-        val bp = ContextCompat.getDrawable(this, R.drawable.bp)
-        val bq = ContextCompat.getDrawable(this, R.drawable.bq)
-        val br = ContextCompat.getDrawable(this, R.drawable.br)
+        chessboard.addChessman(Chessman(1, 7, Actor.bp))
+        chessboard.addChessman(Chessman(2, 7, Actor.bp))
+        chessboard.addChessman(Chessman(3, 7, Actor.bp))
+        chessboard.addChessman(Chessman(4, 7, Actor.bp))
+        chessboard.addChessman(Chessman(5, 7, Actor.bp))
+        chessboard.addChessman(Chessman(6, 7, Actor.bp))
+        chessboard.addChessman(Chessman(7, 7, Actor.bp))
+        chessboard.addChessman(Chessman(8, 7, Actor.bp))
 
-        val wb = ContextCompat.getDrawable(this, R.drawable.wb)
-        val wk = ContextCompat.getDrawable(this, R.drawable.wk)
-        val wn = ContextCompat.getDrawable(this, R.drawable.wn)
-        val wp = ContextCompat.getDrawable(this, R.drawable.wp)
-        val wq = ContextCompat.getDrawable(this, R.drawable.wq)
-        val wr = ContextCompat.getDrawable(this, R.drawable.wr)
 
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bp); x = 1; y = 7 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bp); x = 2; y = 7 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bp); x = 3; y = 7 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bp); x = 4; y = 7 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bp); x = 5; y = 7 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bp); x = 6; y = 7 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bp); x = 7; y = 7 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bp); x = 8; y = 7 })
+        chessboard.addChessman(Chessman(1, 8, Actor.bR))
+        chessboard.addChessman(Chessman(8, 8, Actor.bR))
+        chessboard.addChessman(Chessman(2, 8, Actor.bN))
+        chessboard.addChessman(Chessman(7, 8, Actor.bN))
+        chessboard.addChessman(Chessman(3, 8, Actor.bB))
+        chessboard.addChessman(Chessman(6, 8, Actor.bB))
+        chessboard.addChessman(Chessman(4, 8, Actor.bQ))
+        chessboard.addChessman(Chessman(5, 8, Actor.bK))
 
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(br); x = 1; y = 8 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(br); x = 8; y = 8 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bn); x = 2; y = 8 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bn); x = 7; y = 8 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bb); x = 3; y = 8 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bb); x = 6; y = 8 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bq); x = 4; y = 8 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(bk); x = 5; y = 8 })
+        chessboard.addChessman(Chessman(1, 2, Actor.wp))
+        chessboard.addChessman(Chessman(2, 2, Actor.wp))
+        chessboard.addChessman(Chessman(3, 2, Actor.wp))
+        chessboard.addChessman(Chessman(4, 2, Actor.wp))
+        chessboard.addChessman(Chessman(5, 2, Actor.wp))
+        chessboard.addChessman(Chessman(6, 2, Actor.wp))
+        chessboard.addChessman(Chessman(7, 2, Actor.wp))
+        chessboard.addChessman(Chessman(8, 2, Actor.wp))
 
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wp); x = 1; y = 2 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wp); x = 2; y = 2 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wp); x = 3; y = 2 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wp); x = 4; y = 2 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wp); x = 5; y = 2 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wp); x = 6; y = 2 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wp); x = 7; y = 2 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wp); x = 8; y = 2 })
 
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wr); x = 1; y = 1 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wr); x = 8; y = 1 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wn); x = 2; y = 1 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wn); x = 7; y = 1 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wb); x = 3; y = 1 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wb); x = 6; y = 1 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wq); x = 4; y = 1 })
-        chessboard.addChessman(ChessView(this).apply { setImageDrawable(wk); x = 5; y = 1 })
-
+        chessboard.addChessman(Chessman(1, 1, Actor.wR))
+        chessboard.addChessman(Chessman(8, 1, Actor.wR))
+        chessboard.addChessman(Chessman(2, 1, Actor.wN))
+        chessboard.addChessman(Chessman(7, 1, Actor.wN))
+        chessboard.addChessman(Chessman(3, 1, Actor.wB))
+        chessboard.addChessman(Chessman(6, 1, Actor.wB))
+        chessboard.addChessman(Chessman(4, 1, Actor.wQ))
+        chessboard.addChessman(Chessman(5, 1, Actor.wK))
 
     }
 }
