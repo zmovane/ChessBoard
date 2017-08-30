@@ -15,19 +15,19 @@ class ChessmanView : ImageView {
             field = value
             val resId =
                     when (value?.actor) {
-                        Actor.wp -> R.drawable.wp
-                        Actor.wB -> R.drawable.wb
-                        Actor.wK -> R.drawable.wk
-                        Actor.wN -> R.drawable.wn
-                        Actor.wQ -> R.drawable.wq
-                        Actor.wR -> R.drawable.wr
+                        Actor.WP -> R.drawable.wp
+                        Actor.WB -> R.drawable.wb
+                        Actor.WK -> R.drawable.wk
+                        Actor.WN -> R.drawable.wn
+                        Actor.WQ -> R.drawable.wq
+                        Actor.WR -> R.drawable.wr
 
-                        Actor.bp -> R.drawable.bp
-                        Actor.bB -> R.drawable.bb
-                        Actor.bK -> R.drawable.bk
-                        Actor.bN -> R.drawable.bn
-                        Actor.bQ -> R.drawable.bq
-                        Actor.bR -> R.drawable.br
+                        Actor.BP -> R.drawable.bp
+                        Actor.BB -> R.drawable.bb
+                        Actor.BK -> R.drawable.bk
+                        Actor.BN -> R.drawable.bn
+                        Actor.BQ -> R.drawable.bq
+                        Actor.BR -> R.drawable.br
                         else -> 0
                     }
             setBackgroundDrawable(ContextCompat.getDrawable(context, resId))
