@@ -1,5 +1,4 @@
 # ChessBoard
-ongoing
 
 ### preview
 
