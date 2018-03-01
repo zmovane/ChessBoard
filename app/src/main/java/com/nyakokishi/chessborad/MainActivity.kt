@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        val chessboard = findViewById(R.id.chessborad) as ChessBoardView
+        val chessboard = findViewById<ChessBoardView>(R.id.chessborad)
 
         chessboard.addChessman(Chessman(1, 7, Actor.BP))
         chessboard.addChessman(Chessman(2, 7, Actor.BP))

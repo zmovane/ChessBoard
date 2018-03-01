@@ -30,15 +30,13 @@ class ChessmanView : ImageView {
                         Actor.BR -> R.drawable.br
                         else -> 0
                     }
-            setBackgroundDrawable(ContextCompat.getDrawable(context, resId))
+            background = ContextCompat.getDrawable(context, resId)
         }
 
     constructor(context: Context) : super(context) {
         ChessmanView(context, null)
     }
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-
-    }
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
 }

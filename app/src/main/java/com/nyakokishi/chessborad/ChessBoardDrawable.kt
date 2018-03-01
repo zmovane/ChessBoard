@@ -6,15 +6,15 @@ import android.graphics.drawable.Drawable
 /**
  * Created by nyakokishi on 2017/8/12.
  */
-class ChessBoardDrawable(positiveColor: Int, negativeColor: Int) : Drawable() {
+class ChessBoardDrawable(lightColor: Int, darkColor: Int) : Drawable() {
 
-    val positivePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    val negativePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    val bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val lightPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val darkPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     init {
-        positivePaint.color = positiveColor
-        negativePaint.color = negativeColor
+        lightPaint.color = lightColor
+        darkPaint.color = darkColor
     }
 
     override fun draw(canvas: Canvas?) {
@@ -23,19 +23,32 @@ class ChessBoardDrawable(positiveColor: Int, negativeColor: Int) : Drawable() {
             return
 
         val bitmap = Bitmap.createBitmap(bounds.width(), bounds.height(), Bitmap.Config.RGB_565)
-        val c = Canvas(bitmap)
-        var i = 0
-        val cellWidth = bitmap.width / 8
+        val bitmapCanvas = Canvas(bitmap)
+        val squareWidth = bitmap.width / 8
 
-        while (i < 64) {
-            val x = (i % 8) * cellWidth
-            val y = (i / 8) * cellWidth
-            c.drawRect(Rect(x, y, x + cellWidth, y + cellWidth),
-                    if (i % 8 % 2 == 0 && i / 8 % 2 != 0
-                            || i % 8 % 2 != 0 && i / 8 % 2 == 0) positivePaint else negativePaint)
-            i++
+        for (row in 0..7) {
+
+            val y = row * squareWidth
+
+            for (column in 0..7) {
+
+                val x = column * squareWidth
+                val rect = Rect(x, y, x + squareWidth, y + squareWidth)
+                val paint =
+                        if (isLightSquare(row, column))
+                            lightPaint
+                        else
+                            darkPaint
+
+                bitmapCanvas.drawRect(rect, paint)
+            }
         }
+
         canvas?.drawBitmap(bitmap, 0f, 0f, Paint())
+    }
+
+    private fun isLightSquare(row: Int, column: Int): Boolean {
+        return (column % 2 == 0 && row % 2 != 0 || column % 2 != 0 && row % 2 == 0)
     }
 
     override fun setAlpha(alpha: Int) {
