@@ -4,7 +4,7 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 
 /**
- * Created by nyakokishi on 2017/8/12.
+ ** Created by nyakokishi on 2017/8/12.
  */
 class ChessBoardDrawable(lightColor: Int, darkColor: Int) : Drawable() {
 
@@ -47,17 +47,15 @@ class ChessBoardDrawable(lightColor: Int, darkColor: Int) : Drawable() {
         canvas?.drawBitmap(bitmap, 0f, 0f, Paint())
     }
 
-    private fun isLightSquare(row: Int, column: Int): Boolean {
-        return (column % 2 == 0 && row % 2 != 0 || column % 2 != 0 && row % 2 == 0)
-    }
+    private fun isLightSquare(row: Int, column: Int) =
+            column % 2 == 0 && row % 2 != 0 || column % 2 != 0 && row % 2 == 0
+
 
     override fun setAlpha(alpha: Int) {
         bitmapPaint.alpha = alpha
     }
 
-    override fun getOpacity(): Int {
-        return PixelFormat.TRANSLUCENT
-    }
+    override fun getOpacity() = PixelFormat.TRANSLUCENT
 
     override fun setColorFilter(colorFilter: ColorFilter?) {
         bitmapPaint.colorFilter = colorFilter

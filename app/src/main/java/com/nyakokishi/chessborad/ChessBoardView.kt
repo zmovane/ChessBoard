@@ -5,7 +5,6 @@ import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
-import android.os.Handler
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -14,32 +13,43 @@ import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 
 /**
- * Created by nyakokishi on 2017/8/12.
+ ** Created by nyakokishi on 2017/8/12.
  */
 class ChessBoardView : FrameLayout, View.OnTouchListener {
 
+    companion object {
+        const val VIEW_TAG_INDICATOR = "VIEW_TAG_INDICATOR"
+    }
 
     private var darkColor: Int = Color.BLACK
     private var lightColor: Int = Color.WHITE
 
-    private var indicator: View? = null
-    private var mChessmanView: ChessmanView? = null
+    private var chessmanCurrentPosition: String = ""
+    private var chessmanNextPosition: String = ""
 
-    private var squareWidth: Int? = null
-    private var isEnableMove = true
+    private var isChessmanMoving = false
+    private var squareWidth: Int = -1
 
     private lateinit var chessBoardDrawable: ChessBoardDrawable
 
-    constructor(context: Context) : super(context) {
-        ChessBoardView(context, null)
-    }
+    constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
 
         val ta = context.obtainStyledAttributes(attrs, R.styleable.ChessBoardView)
-        darkColor = ta.getColor(R.styleable.ChessBoardView_negativeColor, Color.BLACK)
-        lightColor = ta.getColor(R.styleable.ChessBoardView_positiveColor, Color.WHITE)
+
+        darkColor = ta.getColor(R.styleable.ChessBoardView_dark_color, Color.BLACK)
+        lightColor = ta.getColor(R.styleable.ChessBoardView_light_color, Color.WHITE)
         chessBoardDrawable = ChessBoardDrawable(darkColor, lightColor)
+
+        val indicatorDrawable = ta.getDrawable(R.styleable.ChessBoardView_indicator)
+                ?: ContextCompat.getDrawable(context, R.drawable.default_indicator)
+        val indicatorView = View(context).apply {
+            background = indicatorDrawable
+            visibility = View.GONE
+            tag = VIEW_TAG_INDICATOR
+        }
+        addView(indicatorView)
 
         ta.recycle()
 
@@ -49,57 +59,67 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, widthMeasureSpec)
 
-        squareWidth ?: kotlin.run {
-            val width = MeasureSpec.getSize(widthMeasureSpec)
-            squareWidth = width / 8
-        }
+        val width = MeasureSpec.getSize(widthMeasureSpec)
 
-        background ?: kotlin.run {
+        background ?: run {
             chessBoardDrawable.setBounds(0, 0, width, width)
             background = chessBoardDrawable
         }
+
+        if (squareWidth == -1) squareWidth = width / 8
     }
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+
         when (event?.action) {
+
             MotionEvent.ACTION_DOWN -> {
-                if (isEnableMove && mChessmanView != null) {
-                    val newX = 1 + (event.x / squareWidth!!).toInt()
-                    val newY = 8 - (event.y / squareWidth!!).toInt()
-                    mChessmanView?.chessman?.x = newX
-                    mChessmanView?.chessman?.y = newY
+
+                if (!isChessmanMoving && chessmanCurrentPosition.isNotEmpty()) {
+
+                    val newX = 1 + (event.x / squareWidth).toInt()
+                    val newY = 8 - (event.y / squareWidth).toInt()
+                    chessmanNextPosition = ChessUtil.convertPositionToTag(newX, newY)
                 }
+
                 return true
             }
+
             MotionEvent.ACTION_UP -> {
-                if (isEnableMove && mChessmanView != null)
+
+                if (!isChessmanMoving && chessmanNextPosition.isNotEmpty())
                     moveChessman()
+
                 return true
             }
+
             else -> return super.onTouchEvent(event)
         }
     }
 
-
     private fun moveChessman() {
-        isEnableMove = false
-        indicator?.visibility = View.GONE
 
-        val chessmanLayoutParams = mChessmanView?.layoutParams as FrameLayout.LayoutParams
+        val chessmanView = findViewWithTag<ChessmanView>(chessmanCurrentPosition) ?: return
 
-        val xAnim = ValueAnimator.ofInt(chessmanLayoutParams.leftMargin, squareWidth!! * (mChessmanView?.chessman?.x!! - 1))
-        val yAnim = ValueAnimator.ofInt(chessmanLayoutParams.topMargin, squareWidth!! * (8 - mChessmanView?.chessman?.y!!))
+        isChessmanMoving = true
+
+        findViewWithTag<View>(VIEW_TAG_INDICATOR).visibility = View.GONE
+
+        val chessmanLayoutParams = chessmanView.layoutParams as FrameLayout.LayoutParams
+
+        val xAnim = ValueAnimator.ofInt(chessmanLayoutParams.leftMargin, squareWidth * (ChessUtil.getXPositionFromTag(chessmanNextPosition) - 1))
+        val yAnim = ValueAnimator.ofInt(chessmanLayoutParams.topMargin, squareWidth * (8 - ChessUtil.getYPositionFromTag(chessmanNextPosition)))
 
         xAnim.addUpdateListener { animation ->
-            val layoutParams = mChessmanView?.layoutParams as FrameLayout.LayoutParams
+            val layoutParams = chessmanView.layoutParams as FrameLayout.LayoutParams
             layoutParams.leftMargin = animation?.animatedValue as Int
-            mChessmanView?.layoutParams = layoutParams
+            chessmanView.layoutParams = layoutParams
         }
 
         yAnim.addUpdateListener { animation ->
-            val layoutParams = mChessmanView?.layoutParams as FrameLayout.LayoutParams
+            val layoutParams = chessmanView.layoutParams as FrameLayout.LayoutParams
             layoutParams.topMargin = animation?.animatedValue as Int
-            mChessmanView?.layoutParams = layoutParams
+            chessmanView.layoutParams = layoutParams
         }
 
         val animSet = AnimatorSet()
@@ -112,45 +132,73 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
             override fun onAnimationStart(animation: Animator?) = Unit
             override fun onAnimationRepeat(animation: Animator?) = Unit
             override fun onAnimationEnd(animation: Animator?) {
-                mChessmanView = null
-                isEnableMove = true
+                isChessmanMoving = false
             }
         })
 
         animSet.start()
+
+        chessmanCurrentPosition = chessmanNextPosition
+        chessmanNextPosition = ""
     }
 
-    fun addChessman(chessman: Chessman) {
+    private fun addChessman(chessman: Chessman) {
 
-        squareWidth ?: run {
-            Handler().postDelayed({ addChessman(chessman) }, 100)
-            return
-        }
+        val chessmanView = ChessmanView(context, chessman)
 
-        val chessmanView = ChessmanView(context)
-        chessmanView.chessman = chessman
-
-        val chessmanLayoutParams = FrameLayout.LayoutParams(squareWidth!!, squareWidth!!)
-        chessmanLayoutParams.leftMargin = squareWidth!! * (chessman.x - 1)
-        chessmanLayoutParams.topMargin = squareWidth!! * (8 - chessman.y)
-        addView(chessmanView, chessmanLayoutParams)
+        val chessmanViewLayoutParams = FrameLayout.LayoutParams(squareWidth, squareWidth)
+        chessmanViewLayoutParams.leftMargin = squareWidth * (chessman.xPosition() - 1)
+        chessmanViewLayoutParams.topMargin = squareWidth * (8 - chessman.yPosition())
+        addView(chessmanView, chessmanViewLayoutParams)
         chessmanView.setOnClickListener {
 
-            if (!isEnableMove) return@setOnClickListener
+            if (isChessmanMoving) return@setOnClickListener
 
-            mChessmanView = chessmanView
+            chessmanCurrentPosition = chessmanView.tag as String
 
-            indicator?.let {
-                indicator?.visibility = View.VISIBLE
-                indicator?.layoutParams = chessmanLayoutParams
-            } ?: kotlin.run {
-                indicator = View(context).apply {
-                    background = ContextCompat.getDrawable(context, R.drawable.frame)
-                }
-                addView(indicator, chessmanLayoutParams)
-            }
-
+            val indicatorView = findViewWithTag<View>(VIEW_TAG_INDICATOR)
+            indicatorView.layoutParams = chessmanViewLayoutParams
+            indicatorView.visibility = View.VISIBLE
         }
+    }
+
+    fun init() {
+
+        addChessman(Chessman('a', 7, Actor.BP))
+        addChessman(Chessman('b', 7, Actor.BP))
+        addChessman(Chessman('c', 7, Actor.BP))
+        addChessman(Chessman('d', 7, Actor.BP))
+        addChessman(Chessman('e', 7, Actor.BP))
+        addChessman(Chessman('f', 7, Actor.BP))
+        addChessman(Chessman('g', 7, Actor.BP))
+        addChessman(Chessman('h', 7, Actor.BP))
+
+        addChessman(Chessman('a', 8, Actor.BR))
+        addChessman(Chessman('h', 8, Actor.BR))
+        addChessman(Chessman('b', 8, Actor.BN))
+        addChessman(Chessman('g', 8, Actor.BN))
+        addChessman(Chessman('c', 8, Actor.BB))
+        addChessman(Chessman('f', 8, Actor.BB))
+        addChessman(Chessman('d', 8, Actor.BQ))
+        addChessman(Chessman('e', 8, Actor.BK))
+
+        addChessman(Chessman('a', 2, Actor.WP))
+        addChessman(Chessman('b', 2, Actor.WP))
+        addChessman(Chessman('c', 2, Actor.WP))
+        addChessman(Chessman('d', 2, Actor.WP))
+        addChessman(Chessman('e', 2, Actor.WP))
+        addChessman(Chessman('f', 2, Actor.WP))
+        addChessman(Chessman('g', 2, Actor.WP))
+        addChessman(Chessman('h', 2, Actor.WP))
+
+        addChessman(Chessman('a', 1, Actor.WR))
+        addChessman(Chessman('h', 1, Actor.WR))
+        addChessman(Chessman('b', 1, Actor.WN))
+        addChessman(Chessman('g', 1, Actor.WN))
+        addChessman(Chessman('c', 1, Actor.WB))
+        addChessman(Chessman('f', 1, Actor.WB))
+        addChessman(Chessman('d', 1, Actor.WQ))
+        addChessman(Chessman('e', 1, Actor.WK))
     }
 
 }

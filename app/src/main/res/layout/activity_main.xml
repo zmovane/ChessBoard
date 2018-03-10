@@ -12,8 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        app:negativeColor="#787878"
-        app:positiveColor="#ffffff"
+        app:dark_color="#787878"
+        app:light_color="#ffffff"
         />
 
 </FrameLayout>
