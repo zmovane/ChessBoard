@@ -3,7 +3,7 @@ package com.nyakokishi.chessborad
 /**
  ** Created by nyakokishi on 18-3-11.
  */
-object ChessUtil{
+object ChessUtil {
 
     fun convertLetterToPosition(letter: Char) =
             listOf('-', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h').indexOf(letter)
