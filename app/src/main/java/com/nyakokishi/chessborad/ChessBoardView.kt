@@ -2,7 +2,7 @@ package com.nyakokishi.chessborad
 
 import android.animation.Animator
 import android.animation.AnimatorSet
-import android.animation.ValueAnimator
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Color
 import android.support.v4.content.ContextCompat
@@ -105,38 +105,26 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
 
         findViewWithTag<View>(VIEW_TAG_INDICATOR).visibility = View.GONE
 
-        val chessmanLayoutParams = chessmanView.layoutParams as FrameLayout.LayoutParams
+        val nextX = 1f * squareWidth * (ChessUtil.getXPositionFromTag(chessmanNextPosition) - 1)
+        val nextY = 1f * squareWidth * (8 - ChessUtil.getYPositionFromTag(chessmanNextPosition))
+        val xAnim = ObjectAnimator.ofFloat(chessmanView, "translationX", chessmanView.translationX, nextX)
+        val yAnim = ObjectAnimator.ofFloat(chessmanView, "translationY", chessmanView.translationY, nextY)
 
-        val xAnim = ValueAnimator.ofInt(chessmanLayoutParams.leftMargin, squareWidth * (ChessUtil.getXPositionFromTag(chessmanNextPosition) - 1))
-        val yAnim = ValueAnimator.ofInt(chessmanLayoutParams.topMargin, squareWidth * (8 - ChessUtil.getYPositionFromTag(chessmanNextPosition)))
+        AnimatorSet().apply {
+            playTogether(xAnim, yAnim)
+            duration = 200L
+            interpolator = LinearInterpolator()
+            addListener(object : Animator.AnimatorListener {
+                override fun onAnimationCancel(animation: Animator?) = Unit
+                override fun onAnimationStart(animation: Animator?) = Unit
+                override fun onAnimationRepeat(animation: Animator?) = Unit
+                override fun onAnimationEnd(animation: Animator?) {
+                    isChessmanMoving = false
+                }
+            })
 
-        xAnim.addUpdateListener { animation ->
-            val layoutParams = chessmanView.layoutParams as FrameLayout.LayoutParams
-            layoutParams.leftMargin = animation?.animatedValue as Int
-            chessmanView.layoutParams = layoutParams
+            start()
         }
-
-        yAnim.addUpdateListener { animation ->
-            val layoutParams = chessmanView.layoutParams as FrameLayout.LayoutParams
-            layoutParams.topMargin = animation?.animatedValue as Int
-            chessmanView.layoutParams = layoutParams
-        }
-
-        val animSet = AnimatorSet()
-
-        animSet.playTogether(xAnim, yAnim)
-        animSet.duration = 200L
-        animSet.interpolator = LinearInterpolator()
-        animSet.addListener(object : Animator.AnimatorListener {
-            override fun onAnimationCancel(animation: Animator?) = Unit
-            override fun onAnimationStart(animation: Animator?) = Unit
-            override fun onAnimationRepeat(animation: Animator?) = Unit
-            override fun onAnimationEnd(animation: Animator?) {
-                isChessmanMoving = false
-            }
-        })
-
-        animSet.start()
 
         chessmanCurrentPosition = chessmanNextPosition
         chessmanNextPosition = ""
@@ -147,8 +135,8 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
         val chessmanView = ChessmanView(context, chessman)
 
         val chessmanViewLayoutParams = FrameLayout.LayoutParams(squareWidth, squareWidth)
-        chessmanViewLayoutParams.leftMargin = squareWidth * (chessman.xPosition() - 1)
-        chessmanViewLayoutParams.topMargin = squareWidth * (8 - chessman.yPosition())
+        chessmanView.translationX = 1f * squareWidth * (chessman.xPosition() - 1)
+        chessmanView.translationY = 1f * squareWidth * (8 - chessman.yPosition())
         addView(chessmanView, chessmanViewLayoutParams)
         chessmanView.setOnClickListener {
 
@@ -158,6 +146,8 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
 
             val indicatorView = findViewWithTag<View>(VIEW_TAG_INDICATOR)
             indicatorView.layoutParams = chessmanViewLayoutParams
+            indicatorView.translationX = chessmanView.translationX
+            indicatorView.translationY = chessmanView.translationY
             indicatorView.visibility = View.VISIBLE
         }
     }
