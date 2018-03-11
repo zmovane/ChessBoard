@@ -145,7 +145,7 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
 
                 lastMovedChessmanPosition = tag as String
 
-                with(findViewWithTag<View>(VIEW_TAG_INDICATOR)){
+                with(findViewWithTag<View>(VIEW_TAG_INDICATOR)) {
                     layoutParams = layoutParams as FrameLayout.LayoutParams
                     translationX = translationX
                     translationY = translationY
@@ -158,41 +158,41 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
 
     fun init() {
 
-        addChessman(Chessman('a', 7, Actor.BP))
-        addChessman(Chessman('b', 7, Actor.BP))
-        addChessman(Chessman('c', 7, Actor.BP))
-        addChessman(Chessman('d', 7, Actor.BP))
-        addChessman(Chessman('e', 7, Actor.BP))
-        addChessman(Chessman('f', 7, Actor.BP))
-        addChessman(Chessman('g', 7, Actor.BP))
-        addChessman(Chessman('h', 7, Actor.BP))
+        addChessman(Chessman("a7", Actor.BP))
+        addChessman(Chessman("b7", Actor.BP))
+        addChessman(Chessman("c7", Actor.BP))
+        addChessman(Chessman("d7", Actor.BP))
+        addChessman(Chessman("e7", Actor.BP))
+        addChessman(Chessman("f7", Actor.BP))
+        addChessman(Chessman("g7", Actor.BP))
+        addChessman(Chessman("h7", Actor.BP))
 
-        addChessman(Chessman('a', 8, Actor.BR))
-        addChessman(Chessman('h', 8, Actor.BR))
-        addChessman(Chessman('b', 8, Actor.BN))
-        addChessman(Chessman('g', 8, Actor.BN))
-        addChessman(Chessman('c', 8, Actor.BB))
-        addChessman(Chessman('f', 8, Actor.BB))
-        addChessman(Chessman('d', 8, Actor.BQ))
-        addChessman(Chessman('e', 8, Actor.BK))
+        addChessman(Chessman("a8", Actor.BR))
+        addChessman(Chessman("h8", Actor.BR))
+        addChessman(Chessman("b8", Actor.BN))
+        addChessman(Chessman("g8", Actor.BN))
+        addChessman(Chessman("c8", Actor.BB))
+        addChessman(Chessman("f8", Actor.BB))
+        addChessman(Chessman("d8", Actor.BQ))
+        addChessman(Chessman("e8", Actor.BK))
 
-        addChessman(Chessman('a', 2, Actor.WP))
-        addChessman(Chessman('b', 2, Actor.WP))
-        addChessman(Chessman('c', 2, Actor.WP))
-        addChessman(Chessman('d', 2, Actor.WP))
-        addChessman(Chessman('e', 2, Actor.WP))
-        addChessman(Chessman('f', 2, Actor.WP))
-        addChessman(Chessman('g', 2, Actor.WP))
-        addChessman(Chessman('h', 2, Actor.WP))
+        addChessman(Chessman("a2", Actor.WP))
+        addChessman(Chessman("b2", Actor.WP))
+        addChessman(Chessman("c2", Actor.WP))
+        addChessman(Chessman("d2", Actor.WP))
+        addChessman(Chessman("e2", Actor.WP))
+        addChessman(Chessman("f2", Actor.WP))
+        addChessman(Chessman("g2", Actor.WP))
+        addChessman(Chessman("h2", Actor.WP))
 
-        addChessman(Chessman('a', 1, Actor.WR))
-        addChessman(Chessman('h', 1, Actor.WR))
-        addChessman(Chessman('b', 1, Actor.WN))
-        addChessman(Chessman('g', 1, Actor.WN))
-        addChessman(Chessman('c', 1, Actor.WB))
-        addChessman(Chessman('f', 1, Actor.WB))
-        addChessman(Chessman('d', 1, Actor.WQ))
-        addChessman(Chessman('e', 1, Actor.WK))
+        addChessman(Chessman("a1", Actor.WR))
+        addChessman(Chessman("h1", Actor.WR))
+        addChessman(Chessman("b1", Actor.WN))
+        addChessman(Chessman("g1", Actor.WN))
+        addChessman(Chessman("c1", Actor.WB))
+        addChessman(Chessman("f1", Actor.WB))
+        addChessman(Chessman("d1", Actor.WQ))
+        addChessman(Chessman("e1", Actor.WK))
     }
 
 }
