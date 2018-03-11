@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 
@@ -19,6 +20,21 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
 
     companion object {
         const val VIEW_TAG_INDICATOR = "VIEW_TAG_INDICATOR"
+        private val INITIAL_STATE = mapOf(
+            Actor.BP to setOf("a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7"),
+            Actor.BR to setOf("a8", "h8"),
+            Actor.BN to setOf("b8", "g8"),
+            Actor.BB to setOf("c8", "f8"),
+            Actor.BQ to setOf("d8"),
+            Actor.BK to setOf("e8"),
+
+            Actor.WP to setOf("a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"),
+            Actor.WR to setOf("a1", "h1"),
+            Actor.WN to setOf("b1", "g1"),
+            Actor.WB to setOf("c1", "f1"),
+            Actor.WQ to setOf("d1"),
+            Actor.WK to setOf("e1")
+        )
     }
 
     private var darkSquareColor: Int = Color.BLACK
@@ -45,7 +61,7 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
 
         View(context).apply {
             background = ta.getDrawable(R.styleable.ChessBoardView_indicator)
-                    ?: ContextCompat.getDrawable(context, R.drawable.default_indicator)
+                ?: ContextCompat.getDrawable(context, R.drawable.default_indicator)
             visibility = View.GONE
             tag = VIEW_TAG_INDICATOR
             addView(this)
@@ -108,8 +124,10 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
         val nextX = 1f * squareWidth * (ChessUtil.getXPositionFromTag(nextChessmanPosition) - 1)
         val nextY = 1f * squareWidth * (8 - ChessUtil.getYPositionFromTag(nextChessmanPosition))
 
-        val xAxisAnim = ObjectAnimator.ofFloat(chessmanView, "translationX", chessmanView.translationX, nextX)
-        val yAxisAnim = ObjectAnimator.ofFloat(chessmanView, "translationY", chessmanView.translationY, nextY)
+        val xAxisAnim =
+            ObjectAnimator.ofFloat(chessmanView, "translationX", chessmanView.translationX, nextX)
+        val yAxisAnim =
+            ObjectAnimator.ofFloat(chessmanView, "translationY", chessmanView.translationY, nextY)
 
         AnimatorSet().apply {
             playTogether(xAxisAnim, yAxisAnim)
@@ -132,67 +150,38 @@ class ChessBoardView : FrameLayout, View.OnTouchListener {
 
     private fun addChessman(chessman: Chessman) {
 
-        ChessmanView(context, chessman).apply {
+        val chessmanView = ChessmanView(context, chessman)
+        chessmanView.translationX = 1f * squareWidth * (chessman.xPosition() - 1)
+        chessmanView.translationY = 1f * squareWidth * (8 - chessman.yPosition())
 
-            translationX = 1f * squareWidth * (chessman.xPosition() - 1)
-            translationY = 1f * squareWidth * (8 - chessman.yPosition())
+        addView(chessmanView, LayoutParams(squareWidth, squareWidth))
 
-            addView(this, FrameLayout.LayoutParams(squareWidth, squareWidth))
+        chessmanView.setOnClickListener {
+            if (isChessmanMoving) return@setOnClickListener
 
-            setOnClickListener {
+            lastMovedChessmanPosition = it.tag as String
 
-                if (isChessmanMoving) return@setOnClickListener
-
-                lastMovedChessmanPosition = tag as String
-
-                with(findViewWithTag<View>(VIEW_TAG_INDICATOR)) {
-                    layoutParams = layoutParams as FrameLayout.LayoutParams
-                    translationX = translationX
-                    translationY = translationY
-                    visibility = View.VISIBLE
-                }
-
+            with(findViewWithTag<View>(VIEW_TAG_INDICATOR)) {
+                this.layoutParams = it.layoutParams as LayoutParams
+                this.translationX = it.translationX
+                this.translationY = it.translationY
+                this.visibility = View.VISIBLE
             }
         }
     }
 
     fun init() {
-
-        addChessman(Chessman("a7", Actor.BP))
-        addChessman(Chessman("b7", Actor.BP))
-        addChessman(Chessman("c7", Actor.BP))
-        addChessman(Chessman("d7", Actor.BP))
-        addChessman(Chessman("e7", Actor.BP))
-        addChessman(Chessman("f7", Actor.BP))
-        addChessman(Chessman("g7", Actor.BP))
-        addChessman(Chessman("h7", Actor.BP))
-
-        addChessman(Chessman("a8", Actor.BR))
-        addChessman(Chessman("h8", Actor.BR))
-        addChessman(Chessman("b8", Actor.BN))
-        addChessman(Chessman("g8", Actor.BN))
-        addChessman(Chessman("c8", Actor.BB))
-        addChessman(Chessman("f8", Actor.BB))
-        addChessman(Chessman("d8", Actor.BQ))
-        addChessman(Chessman("e8", Actor.BK))
-
-        addChessman(Chessman("a2", Actor.WP))
-        addChessman(Chessman("b2", Actor.WP))
-        addChessman(Chessman("c2", Actor.WP))
-        addChessman(Chessman("d2", Actor.WP))
-        addChessman(Chessman("e2", Actor.WP))
-        addChessman(Chessman("f2", Actor.WP))
-        addChessman(Chessman("g2", Actor.WP))
-        addChessman(Chessman("h2", Actor.WP))
-
-        addChessman(Chessman("a1", Actor.WR))
-        addChessman(Chessman("h1", Actor.WR))
-        addChessman(Chessman("b1", Actor.WN))
-        addChessman(Chessman("g1", Actor.WN))
-        addChessman(Chessman("c1", Actor.WB))
-        addChessman(Chessman("f1", Actor.WB))
-        addChessman(Chessman("d1", Actor.WQ))
-        addChessman(Chessman("e1", Actor.WK))
+        viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                viewTreeObserver.removeOnGlobalLayoutListener(this)
+                INITIAL_STATE.forEach { (actor, set) ->
+                    set.forEach { pos ->
+                        addChessman(Chessman(pos, actor))
+                    }
+                }
+            }
+        })
     }
 
 }
